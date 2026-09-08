@@ -1,0 +1,1327 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SketchCNN — İnteraktif Proje Rehberi</title>
+<style>
+:root{
+  --bg:#0b1020; --panel:#121a2d; --panel2:#0f1728; --line:#26324a;
+  --text:#eef2ff; --muted:#9ba8c7; --accent:#7dd3fc; --accent2:#a78bfa;
+  --good:#86efac; --warn:#fbbf24; --danger:#fca5a5;
+  --shadow:0 18px 45px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 20% 0%,#16213c 0,#0b1020 38%,#080c16 100%);color:var(--text);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,input{font:inherit}
+.app{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:100vh}
+aside{position:sticky;top:0;height:100vh;padding:22px 18px;border-right:1px solid var(--line);background:rgba(9,14,27,.92);backdrop-filter:blur(16px)}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.02em}.brand small{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-top:4px}
+.nav{margin-top:24px;display:grid;gap:7px}.nav a{color:var(--muted);text-decoration:none;padding:10px 12px;border-radius:11px;border:1px solid transparent}.nav a:hover{color:var(--text);background:#121a2d;border-color:var(--line)}
+.status{margin-top:24px;padding:13px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);font-size:12px;color:var(--muted)}.status b{color:var(--good)}
+main{padding:34px;max-width:1480px;width:100%}
+.hero{padding:28px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,rgba(125,211,252,.09),rgba(167,139,250,.08));box-shadow:var(--shadow)}
+.kicker{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--accent);font-weight:800}
+h1{margin:8px 0 10px;font-size:clamp(32px,5vw,58px);line-height:1.02;letter-spacing:-.045em}
+.hero p{max-width:850px;color:#c7d2ee;font-size:17px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}.badge{border:1px solid var(--line);background:#0c1425;padding:7px 10px;border-radius:999px;color:#c5d2ef;font-size:12px}
+section{scroll-margin-top:24px;margin-top:26px}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:12px}.section-head h2{margin:0;font-size:24px;letter-spacing:-.02em}.section-head p{margin:0;color:var(--muted);max-width:700px}
+.card{border:1px solid var(--line);border-radius:18px;background:rgba(16,24,42,.93);box-shadow:var(--shadow)}
+.pipeline{display:grid;grid-template-columns:repeat(9,minmax(100px,1fr));gap:8px;padding:18px;overflow-x:auto}
+.node{min-width:118px;padding:15px 12px;border:1px solid var(--line);border-radius:14px;background:#0d1526;cursor:pointer;transition:.18s}.node:hover,.node.active{transform:translateY(-2px);border-color:#5ba4c5;background:#13223a}.node .n{font-size:11px;color:var(--accent);font-weight:800}.node b{display:block;margin:4px 0;font-size:14px}.node span{font-size:11px;color:var(--muted)}.arrow{align-self:center;color:#52607b;text-align:center;font-size:20px}
+.explain{margin-top:12px;padding:17px 19px;border-top:1px solid var(--line);color:#ccd6ef}.explain strong{color:white}
+.grid2{display:grid;grid-template-columns:minmax(300px,1fr) minmax(360px,1.15fr);gap:16px}
+.canvas-wrap{padding:18px}.canvas-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.canvas-stack{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+canvas{width:100%;aspect-ratio:1;border-radius:14px;border:1px solid var(--line);background:#02050b;touch-action:none}.canvas-label{color:var(--muted);font-size:12px;margin:5px 0}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}.btn{border:1px solid var(--line);background:#172239;color:white;padding:9px 12px;border-radius:10px;cursor:pointer}.btn:hover{border-color:#5b6f94}.btn.primary{background:#173a51;border-color:#2f7599}
+.mini{font-size:12px;color:var(--muted)}
+.detail{padding:19px}.detail h3{margin:0 0 8px}.steps{display:grid;gap:9px;margin-top:13px}.step{padding:12px;border-radius:12px;border:1px solid var(--line);background:#0b1324}.step b{color:var(--accent)}
+.arch{padding:18px}.layer{display:grid;grid-template-columns:150px 150px 110px minmax(180px,1fr);gap:9px;align-items:center;padding:11px;border-bottom:1px solid var(--line)}.layer:last-child{border-bottom:0}.layer .shape{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--good)}.layer .op{font-weight:700}.layer .why{color:var(--muted)}
+.term{border-bottom:1px dashed #6f7b96;cursor:pointer;color:#dbeafe}.term:hover{color:var(--accent)}
+.soft{padding:18px}.logits{display:grid;gap:8px}.logit{display:grid;grid-template-columns:90px 1fr 58px;align-items:center;gap:10px}.logit input{width:100%}.bar{height:9px;border-radius:99px;background:#25314a;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0}.probs{display:grid;gap:7px;margin-top:16px}.probrow{display:grid;grid-template-columns:90px 1fr 62px;gap:10px;align-items:center}
+.code{font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:#050914;border:1px solid #1f2b43;border-radius:12px;padding:14px;overflow:auto;color:#cdd8f5;white-space:pre}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.tab{cursor:pointer;border:1px solid var(--line);background:#0d1526;color:var(--muted);padding:8px 10px;border-radius:9px}.tab.active{color:white;background:#17304a;border-color:#3a7196}
+.rebuild{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.recipe{padding:17px}.recipe .num{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#173a51;color:#bde8ff;font-weight:800;margin-bottom:8px}.recipe h3{margin:0 0 7px}.recipe p{color:var(--muted);margin:0}.recipe details{margin-top:10px}.recipe summary{cursor:pointer;color:#dce7ff}
+.glossary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.g{padding:14px;border:1px solid var(--line);background:#0c1425;border-radius:12px}.g b{display:block;margin-bottom:4px}.g span{color:var(--muted);font-size:13px}
+.callout{padding:15px;border-left:3px solid var(--warn);background:rgba(251,191,36,.07);border-radius:8px;color:#e7ddc5}
+footer{color:var(--muted);padding:40px 0 15px;font-size:12px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.66);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.show{display:flex}.modal-card{max-width:620px;width:100%;border:1px solid var(--line);border-radius:18px;background:#10182a;padding:22px;box-shadow:var(--shadow)}.modal-card h3{margin:0 0 8px}.modal-card p{color:#c6d0e8}.x{float:right;border:0;background:none;color:white;font-size:22px;cursor:pointer}
+@media(max-width:1000px){.app{grid-template-columns:1fr}aside{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line)}.nav{grid-template-columns:repeat(4,1fr)}main{padding:20px}.grid2{grid-template-columns:1fr}.rebuild{grid-template-columns:1fr}.glossary{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.nav{grid-template-columns:1fr 1fr}.canvas-stack{grid-template-columns:1fr}.layer{grid-template-columns:1fr 1fr}.layer .why{grid-column:1/-1}.glossary{grid-template-columns:1fr}}
+
+.resolution-grid{display:grid;grid-template-columns:minmax(340px,1.15fr) minmax(340px,1fr);gap:16px}
+.stagebox,.combine{padding:18px}.stage-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.stagebtn{border:1px solid var(--line);background:#0d1526;color:var(--muted);padding:9px 11px;border-radius:10px;cursor:pointer}
+.stagebtn.active{background:#183451;color:#fff;border-color:#4f84a6}
+.stage-viz{display:grid;grid-template-columns:1fr 190px;gap:16px;align-items:center}
+.spatial{aspect-ratio:1;border:1px solid var(--line);border-radius:14px;background:#050914;display:grid;place-items:center;overflow:hidden}
+.pixelgrid{width:80%;height:80%;display:grid;border:1px solid #33415e}
+.pixelgrid span{border-right:1px solid rgba(130,150,190,.18);border-bottom:1px solid rgba(130,150,190,.18)}
+.stack{position:relative;height:220px}.sheet{position:absolute;width:132px;height:132px;border:1px solid #48617e;border-radius:10px;background:rgba(23,35,59,.9);display:flex;align-items:center;justify-content:center;font-weight:800;color:#cfe7ff;box-shadow:0 8px 20px rgba(0,0,0,.24)}
+.stage-meta{margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.metric{padding:10px;border:1px solid var(--line);border-radius:11px;background:#0a1221}.metric b{display:block;font-size:16px}.metric span{font-size:11px;color:var(--muted)}
+.combine-viz{display:grid;grid-template-columns:1fr 80px 1fr;gap:12px;align-items:center;margin-top:14px}.channel-stack{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.ch{aspect-ratio:1;border:1px solid #41516d;background:#0a1220;border-radius:7px;display:grid;place-items:center;font-size:11px;color:#aec2e4}
+.kernel-depth{display:grid;gap:4px}.kernel-slice{height:16px;border:1px solid #5a6f91;background:#17243a;border-radius:4px}
+.output-map{aspect-ratio:1;border:1px solid #48617e;border-radius:12px;background:radial-gradient(circle at 40% 35%,rgba(125,211,252,.55),rgba(167,139,250,.18) 35%,#0a1220 68%);display:grid;place-items:center;font-weight:800}
+.formula{margin-top:14px;padding:13px;border-radius:11px;background:#050914;border:1px solid #1f2b43;font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;color:#d6e0f7;overflow:auto;white-space:pre}
+.rf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.rf{padding:12px;border:1px solid var(--line);border-radius:12px;background:#0b1324}.rf b{display:block}.rf span{font-size:12px;color:var(--muted)}
+.losskeep{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.losskeep>div{padding:13px;border:1px solid var(--line);border-radius:12px;background:#0b1324}.losskeep h4{margin:0 0 6px}
+@media(max-width:1000px){.resolution-grid{grid-template-columns:1fr}.stage-viz{grid-template-columns:1fr}.combine-viz{grid-template-columns:1fr}.rf-grid{grid-template-columns:1fr 1fr}.losskeep{grid-template-columns:1fr}}
+
+
+.mental-flow{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:8px;overflow-x:auto;padding:18px}
+.mstep{min-width:150px;padding:14px;border:1px solid var(--line);border-radius:13px;background:#0b1324;position:relative}
+.mstep b{display:block;margin-bottom:4px}.mstep span{font-size:12px;color:var(--muted)}
+.mstep .arr{position:absolute;right:-17px;top:50%;transform:translateY(-50%);font-size:22px;color:#53617b}
+.meaning-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.meaning-card{padding:14px;border:1px solid var(--line);border-radius:12px;background:#0a1221}
+.meaning-card b{display:block;margin-bottom:5px}
+.meaning-card span{font-size:12px;color:var(--muted)}
+.truthbox{padding:15px;border:1px solid #35516b;border-radius:12px;background:rgba(125,211,252,.06);margin-top:12px}
+@media(max-width:900px){.meaning-grid{grid-template-columns:1fr}}
+
+
+.math-lab{display:grid;grid-template-columns:minmax(340px,1.05fr) minmax(340px,1fr);gap:16px}
+.matrix-card{padding:18px}
+.matrix-grid{display:grid;gap:3px;width:max-content;max-width:100%}
+.cell{width:42px;height:42px;border:1px solid #35435f;border-radius:6px;display:grid;place-items:center;background:#0b1323;font:12px ui-monospace,SFMono-Regular,Menlo,monospace}
+.cell.hl{background:#18334f;border-color:#5b91b5}
+.cell.pad{background:#090d16;color:#59657c}
+.cell.out{background:#13243b}
+.kernelbox{display:grid;grid-template-columns:repeat(3,42px);gap:3px;margin-top:10px}
+.kernelcell{width:42px;height:42px;border:1px solid #5f7091;border-radius:6px;display:grid;place-items:center;background:#17243a;font:12px ui-monospace,SFMono-Regular,Menlo,monospace}
+.calcbox{margin-top:12px;padding:12px;border:1px solid var(--line);background:#050914;border-radius:10px;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#dbe7ff}
+.triptych{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.concept-card{padding:16px}.concept-card h3{margin-top:0}.concept-card .big{font-size:34px;font-weight:800;letter-spacing:-.03em;margin:8px 0}.concept-card p{color:var(--muted)}
+.tiny-flow{display:grid;gap:7px;margin-top:10px}.tiny-step{padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#0b1323;font-size:12px}
+.compare-table{width:100%;border-collapse:collapse;margin-top:12px}.compare-table th,.compare-table td{border-bottom:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}.compare-table th{color:#bcd8f5;font-size:12px}.compare-table td{color:#cbd5ea}
+.filter-demo{display:grid;grid-template-columns:1fr 80px 1fr;gap:10px;align-items:center}.filter-bank{display:grid;gap:6px}.filter-pill{padding:8px;border:1px solid var(--line);border-radius:8px;background:#0b1323;font-size:12px}
+.outputbank{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.omap{aspect-ratio:1;border:1px solid #40516e;border-radius:8px;background:#101c31;display:grid;place-items:center;font-size:11px;color:#bcd3ef}
+.equation-block{padding:14px;background:#050914;border:1px solid #1f2b43;border-radius:11px;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}
+.lesson-note{padding:14px;border-left:3px solid var(--accent);background:rgba(125,211,252,.06);border-radius:8px;margin-top:12px}
+@media(max-width:1000px){.math-lab{grid-template-columns:1fr}.triptych{grid-template-columns:1fr}.filter-demo{grid-template-columns:1fr}.outputbank{grid-template-columns:repeat(4,1fr)}}
+
+
+/* richer teaching animations */
+@keyframes scanPulse{
+  0%{box-shadow:0 0 0 0 rgba(125,211,252,.0)}
+  50%{box-shadow:0 0 0 5px rgba(125,211,252,.18)}
+  100%{box-shadow:0 0 0 0 rgba(125,211,252,.0)}
+}
+@keyframes popIn{
+  from{transform:scale(.88);opacity:.25}
+  to{transform:scale(1);opacity:1}
+}
+@keyframes flowRight{
+  0%{transform:translateX(-8px);opacity:.2}
+  50%{opacity:1}
+  100%{transform:translateX(8px);opacity:.2}
+}
+@keyframes poolFlash{
+  0%{background:#0b1323}
+  45%{background:#2f5f42}
+  100%{background:#0b1323}
+}
+@keyframes channelWave{
+  0%{transform:translateY(0)}
+  50%{transform:translateY(-5px)}
+  100%{transform:translateY(0)}
+}
+@keyframes glowMap{
+  0%{filter:brightness(.85)}
+  50%{filter:brightness(1.3)}
+  100%{filter:brightness(.85)}
+}
+@keyframes fadeSweep{
+  0%{opacity:.25;transform:scale(.95)}
+  50%{opacity:1;transform:scale(1)}
+  100%{opacity:.25;transform:scale(.95)}
+}
+.anim-note{font-size:12px;color:var(--muted);margin-top:8px}
+.anim-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.anim-arrow{font-size:24px;color:var(--accent);animation:flowRight 1.2s ease-in-out infinite}
+.pool-demo{display:grid;grid-template-columns:repeat(2,54px);gap:6px;width:max-content;margin-top:10px}
+.pool-demo .p{width:54px;height:54px;border:1px solid #41516d;border-radius:8px;background:#0b1323;display:grid;place-items:center;font-weight:800}
+.pool-demo .p.max{animation:poolFlash 1.5s ease-in-out infinite}
+.pool-result{width:70px;height:70px;border:1px solid #4b7b5d;border-radius:10px;background:#10251a;display:grid;place-items:center;font-size:22px;font-weight:800}
+.relu-line{display:flex;gap:7px;align-items:flex-end;height:120px;margin-top:12px}
+.relu-bar{width:34px;border-radius:6px 6px 0 0;background:#24334d;transition:.35s;height:var(--h)}
+.relu-bar.neg{background:#37212b}
+.relu-bar.on{background:#244a35;animation:glowMap 1.6s ease-in-out infinite}
+.kernel-anim-card{position:relative}
+.scan-frame{position:absolute;border:2px solid var(--accent);border-radius:7px;pointer-events:none;transition:all .38s ease;animation:scanPulse 1.4s ease-in-out infinite}
+.output-build{display:grid;grid-template-columns:repeat(5,42px);gap:4px;margin-top:12px}
+.output-build .o{width:42px;height:42px;border:1px solid #34445f;border-radius:6px;background:#09101d;display:grid;place-items:center;font:11px ui-monospace,SFMono-Regular,Menlo,monospace}
+.output-build .o.filled{background:#18324d;border-color:#5c8cac;animation:popIn .35s ease}
+.channel-river{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.channel-token{padding:8px 10px;border:1px solid #40516c;border-radius:8px;background:#0b1323;animation:channelWave 1.5s ease-in-out infinite}
+.channel-token:nth-child(2n){animation-delay:.12s}.channel-token:nth-child(3n){animation-delay:.22s}
+.mix-center{margin:14px auto;width:120px;height:120px;border-radius:50%;border:1px solid #5c7194;background:radial-gradient(circle,#173654,#0c1423 70%);display:grid;place-items:center;font-weight:800;animation:glowMap 1.8s ease-in-out infinite}
+.hierarchy{display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:10px;margin-top:12px}
+.hier{padding:14px;border:1px solid var(--line);border-radius:12px;background:#0b1323;min-height:140px;position:relative;overflow:hidden}
+.hier::after{content:"";position:absolute;inset:auto -40px -40px auto;width:90px;height:90px;border-radius:50%;background:rgba(125,211,252,.08);animation:fadeSweep 2.2s ease-in-out infinite}
+.hier b{display:block;margin-bottom:8px}
+.hier .symbol{font-size:34px;letter-spacing:5px;margin:12px 0;color:#d8e7ff}
+.weight-bars{display:grid;gap:7px;margin-top:12px}
+.wbar{display:grid;grid-template-columns:70px 1fr 50px;gap:8px;align-items:center}
+.wtrack{height:9px;border-radius:99px;background:#202b40;overflow:hidden}
+.wfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:var(--w);transition:.4s}
+@media(max-width:900px){.hierarchy{grid-template-columns:1fr 1fr}}
+
+
+.training-grid{display:grid;grid-template-columns:minmax(360px,1.15fr) minmax(340px,1fr);gap:16px}
+.train-card{padding:18px}
+.train-pipeline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.train-node{padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:#0b1324;min-width:115px;text-align:center}
+.train-node.active{border-color:#62a4c8;background:#15304a;animation:glowMap 1.2s ease-in-out infinite}
+.train-arrow{font-size:24px;color:#53617b}
+.backward .train-arrow{transform:rotate(180deg)}
+.loss-meter{height:15px;border-radius:99px;background:#202a3f;overflow:hidden;margin-top:12px}
+.loss-fill{height:100%;width:74%;background:linear-gradient(90deg,var(--danger),var(--warn));transition:.45s}
+.prob-sim{display:grid;gap:7px;margin-top:12px}
+.ps-row{display:grid;grid-template-columns:80px 1fr 58px;gap:8px;align-items:center}
+.ps-track{height:9px;background:#222e44;border-radius:99px;overflow:hidden}
+.ps-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.45s}
+.weight-demo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.weight-cell{padding:10px;border:1px solid var(--line);border-radius:9px;background:#0a1221;text-align:center;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;transition:.4s}
+.weight-cell.changed{border-color:#5c8f6c;background:#10251a;animation:popIn .35s ease}
+.epoch-row{display:grid;grid-template-columns:80px 1fr 70px;gap:8px;align-items:center;margin-top:8px}
+.epoch-track{height:9px;background:#202a3f;border-radius:99px;overflow:hidden}
+.epoch-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:var(--w)}
+.splitbar{display:flex;height:58px;border-radius:12px;overflow:hidden;border:1px solid var(--line);margin-top:14px}
+.splitbar>div{display:grid;place-items:center;font-weight:800}
+.trainseg{width:70%;background:#17324d}
+.valseg{width:15%;background:#2a2448}
+.testseg{width:15%;background:#3a2a22}
+.split-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.splitbtn{border:1px solid var(--line);background:#0d1526;color:var(--muted);padding:9px 11px;border-radius:10px;cursor:pointer}
+.splitbtn.active{color:#fff;border-color:#5d8eb0;background:#17324d}
+.split-explain{margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:11px;background:#0a1221}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.metric-card{padding:13px;border:1px solid var(--line);border-radius:11px;background:#0a1221}
+.metric-card b{display:block;font-size:20px}
+.metric-card span{font-size:12px;color:var(--muted)}
+.cm{display:grid;grid-template-columns:repeat(4,52px);gap:4px;margin-top:12px;width:max-content}
+.cm div{width:52px;height:52px;border:1px solid #35435f;border-radius:6px;display:grid;place-items:center;background:#0a1221;font-size:12px}
+.cm .diag{background:#173b2b;border-color:#4b7a5d}
+.eval-flow{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px;margin-top:12px}
+.eval-step{padding:13px;border:1px solid var(--line);border-radius:11px;background:#0b1323}
+.eval-step b{display:block;margin-bottom:4px}
+.checkpoint-badge{display:inline-block;padding:7px 10px;border-radius:999px;background:#173a51;border:1px solid #3f7598;color:#d6eeff;font-weight:800;margin-top:8px}
+@media(max-width:1000px){.training-grid{grid-template-columns:1fr}.metric-grid{grid-template-columns:1fr 1fr}.eval-flow{grid-template-columns:1fr 1fr}}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="brand">SketchCNN Lab<small>İnteraktif mimari ve öğrenme rehberi</small></div>
+  <nav class="nav">
+    <a href="#big">01 · Büyük resim</a>
+    <a href="#draw">02 · Çizim</a>
+    <a href="#cnn">03 · CNN</a>
+    <a href="#resolution">03B · Neden küçültüyoruz?</a>
+    <a href="#mentalmodel">03C · Sayılar nasıl anlam kazanıyor?</a>
+
+    <a href="#kernelmath">03D · Kernel nasıl kayıyor?</a>
+    <a href="#relu-pool-bias">03E · ReLU · Pool · Bias</a>
+    <a href="#channelsfilters">03F · Channel vs Filter</a>
+    <a href="#softmax">04 · Softmax</a>
+    <a href="#training">05 · Training nasıl öğreniyor?</a>
+    <a href="#splits">06 · Train / Val / Test</a>
+    <a href="#evaluation">07 · Evaluation</a>
+    <a href="#data">05 · Veri</a>
+    <a href="#rebuild">08 · Yeniden yap</a>
+    <a href="#terms">09 · Terimler</a>
+  </nav>
+  <div class="status"><b>Kaynak:</b> yüklediğin Python dosyaları<br><br>
+  Bu ekran gerçek model checkpoint'ini çalıştırmaz. Çizim ve preprocessing etkileşimlidir; softmax bölümü öğretim amaçlı örnek logitlerle çalışır.</div>
+</aside>
+
+<main>
+  <div class="hero">
+    <div class="kicker">From pixels to probabilities</div>
+    <h1>Bir çizim nasıl<br>“cat / dog / car…” olur?</h1>
+    <p>Bu ekran projeyi ezberletmek yerine <b>mekanizmayı</b> öğretir. Her adımı tıklayabilir, çizim yapabilir, preprocessing sonucunu görebilir, CNN'deki tensor boyutlarını takip edebilir ve softmax'ın skorları olasılığa nasıl çevirdiğini deneyebilirsin.</p>
+    <div class="badges"><span class="badge">PyTorch</span><span class="badge"></span><span class="badge">CNN</span><span class="badge">64×64 grayscale</span><span class="badge">10 classes</span><span class="badge">CPU inference</span></div>
+  </div>
+
+  <section id="big">
+    <div class="section-head"><h2>01 · Büyük resim</h2><p>Bir tahmin isteğinin uçtan uca yolu. Kutulara tıkla.</p></div>
+    <div class="card">
+      <div class="pipeline" id="pipeline">
+        <div class="node active" data-key="stroke"><div class="n">A</div><b>Stroke</b><span>x/y koordinatları</span></div><div class="arrow">→</div>
+        <div class="node" data-key="prep"><div class="n">B</div><b>Preprocess</b><span>64×64 raster</span></div><div class="arrow">→</div>
+        <div class="node" data-key="tensor"><div class="n">C</div><b>Tensor</b><span>1×64×64</span></div><div class="arrow">→</div>
+        <div class="node" data-key="features"><div class="n">D</div><b>CNN Features</b><span>64×8×8</span></div><div class="arrow">→</div>
+        <div class="node" data-key="logits"><div class="n">E</div><b>Logits</b><span>10 ham skor</span></div><div class="arrow">→</div>
+        <div class="node" data-key="prob"><div class="n">F</div><b>Softmax</b><span>10 olasılık</span></div><div class="arrow">→</div>
+        <div class="node" data-key="json"><div class="n">G</div><b>çıktı</b><span>top-5 + latency</span></div>
+      </div>
+      <div class="explain" id="pipelineExplain"><strong>Stroke:</strong> Tarayıcı resmi PNG olarak değil, kalemin izini ayrı ayrı çizgiler halinde x ve y koordinat dizileri olarak sunucuya gönderir.</div>
+    </div>
+  </section>
+
+  <section id="draw">
+    <div class="section-head"><h2>02 · Çiz ve preprocessing'i gör</h2><p>Sol tarafa fareyle çiz. “Preprocess” ile kodundaki bbox-merkezleme ve ölçekleme fikrinin tarayıcıdaki eşleniğini gör.</p></div>
+    <div class="grid2">
+      <div class="card canvas-wrap">
+        <div class="canvas-head"><b>Tarayıcı girdisi</b><span class="mini" id="strokeStats">0 stroke · 0 point</span></div>
+        <div class="canvas-stack">
+          <div><div class="canvas-label">Ham stroke koordinatları</div><canvas id="drawCanvas" width="420" height="420"></canvas></div>
+          <div><div class="canvas-label">Normalize edilmiş 64×64 önizleme</div><canvas id="prepCanvas" width="256" height="256"></canvas></div>
+        </div>
+        <div class="controls"><button class="btn primary" id="prepBtn">Preprocess</button><button class="btn" id="clearBtn">Temizle</button></div>
+      </div>
+      <div class="card detail">
+        <h3>preprocess_strokes() gerçekte ne yapıyor?</h3>
+        <div class="steps">
+          <div class="step"><b>1. Validate</b> — Her stroke tam olarak iki dizi taşımalı: <code>[x[], y[]]</code>. Uzunluklar eşit ve boş olmamalı.</div>
+          <div class="step"><b>2. Bounding box</b> — Tüm noktaların minimum ve maksimum x/y değerleri bulunuyor. Böylece çizimin kapladığı dikdörtgen alan elde ediliyor.</div>
+          <div class="step"><b>3. Scale</b> — En uzun kenar ölçülüyor ve çizim <code>(64 − 12)</code> piksel içine sığacak şekilde ölçekleniyor. 12 piksel toplam güvenli padding bırakılıyor.</div>
+          <div class="step"><b>4. Center</b> — Bounding box merkezi 64×64 görüntünün merkezine taşınıyor. Kullanıcı küçük/büyük veya köşeye çizse bile modele benzer giriş veriliyor.</div>
+          <div class="step"><b>5. Supersample</b> — Önce 256×256'e (4×) beyaz çizgi çiziliyor, sonra LANCZOS ile 64×64'e küçültülüyor. Bu, kenarları daha düzgün yapıyor.</div>
+          <div class="step"><b>6. Normalize</b> — Piksel değeri 0–255 yerine 0–1 aralığına çevriliyor ve kanal boyutu eklenerek <code>[1,64,64]</code> tensor oluyor.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cnn">
+    <div class="section-head"><h2>03 · CNN'in içinden geç</h2><p>Bu mimaride üç Conv→ReLU→MaxPool bloğu var. Padding uzamsal boyutu korur, pooling her seferinde yarıya indirir.</p></div>
+    <div class="card arch">
+      <div class="layer"><div class="op">Input</div><div class="shape">1×64×64</div><div>—</div><div class="why">Tek kanal: siyah-beyaz/grayscale çizim.</div></div>
+      <div class="layer"><div class="op"><span class="term" data-term="conv">Conv2D</span> + <span class="term" data-term="relu">ReLU</span></div><div class="shape">16×64×64</div><div>3×3 kernel</div><div class="why">16 farklı yerel desen filtresi öğrenir; padding=1 sayesinde 64×64 korunur.</div></div>
+      <div class="layer"><div class="op"><span class="term" data-term="pool">MaxPool</span></div><div class="shape">16×32×32</div><div>÷2</div><div class="why">En güçlü lokal aktivasyonu tutup çözünürlüğü yarıya düşürür.</div></div>
+      <div class="layer"><div class="op">Conv2D + ReLU</div><div class="shape">32×32×32</div><div>3×3</div><div class="why">Daha zengin, daha birleşik özellikler öğrenilir.</div></div>
+      <div class="layer"><div class="op">MaxPool</div><div class="shape">32×16×16</div><div>÷2</div><div class="why">Uzamsal boyut tekrar yarıya iner.</div></div>
+      <div class="layer"><div class="op">Conv2D + ReLU</div><div class="shape">64×16×16</div><div>3×3</div><div class="why">64 feature map: parçaları daha üst seviye şekil ipuçlarına dönüştürür.</div></div>
+      <div class="layer"><div class="op">MaxPool</div><div class="shape">64×8×8</div><div>÷2</div><div class="why">Feature extractor'ın son çıktısı.</div></div>
+      <div class="layer"><div class="op"><span class="term" data-term="flatten">Flatten</span></div><div class="shape">4096</div><div>64·8·8</div><div class="why">3B feature map tek uzun vektöre çevrilir.</div></div>
+      <div class="layer"><div class="op"><span class="term" data-term="dropout">Dropout</span></div><div class="shape">4096</div><div>p=0.2</div><div class="why">Eğitimde ezberlemeyi azaltmak için bazı nöronları rastgele kapatır; eval modunda kapalıdır.</div></div>
+      <div class="layer"><div class="op"><span class="term" data-term="linear">Linear</span></div><div class="shape">10 logits</div><div>4096→10</div><div class="why">Her sınıf için bir ham skor çıkarır. Model toplam 64,266 öğrenilebilir parametre içerir.</div></div>
+    </div>
+  </section>
+
+
+<section id="resolution">
+  <div class="section-head"><h2>03B · Neden çözünürlüğü düşürüp kanal sayısını artırıyoruz?</h2><p>Katmanlara tıkla: spatial grid küçülürken kanal sayısının nasıl arttığını ve önceki feature map'lerin yeni convolution'a nasıl taşındığını gör.</p></div>
+  <div class="resolution-grid">
+    <div class="card stagebox">
+      <h3 style="margin-top:0">Çözünürlük ↔ kanal sayısı</h3>
+      <p class="mini">Sol kare uzamsal çözünürlüğü, sağdaki kart yığını feature-map sayısını temsil eder.</p>
+      <div class="stage-controls" id="stageControls"></div>
+      <div class="stage-viz"><div class="spatial"><div class="pixelgrid" id="pixelGrid"></div></div><div class="stack" id="channelStack"></div></div>
+      <div class="stage-meta"><div class="metric"><b id="mShape">1×64×64</b><span>tensor shape</span></div><div class="metric"><b id="mCells">4096</b><span>hücre / kanal</span></div><div class="metric"><b id="mRF">1×1</b><span>receptive field</span></div></div>
+      <div class="explain" style="border-top:0;padding:14px 0 0" id="stageExplain"></div>
+    </div>
+    <div class="card combine">
+      <h3 style="margin-top:0">Eski feature map'ler nasıl birleşiyor?</h3>
+      <p class="mini"><code>Conv2d(16, 32, 3)</code> içindeki tek bir output filtresi, önceki <b>16 kanalın tamamına</b> bakar.</p>
+      <div class="combine-viz">
+        <div><div class="mini" style="margin-bottom:7px">Önceki katman: 16 kanal</div><div class="channel-stack" id="oldChannels"></div></div>
+        <div style="text-align:center"><div class="mini">3×3 kernel<br>× 16 kanal</div><div class="kernel-depth" id="kernelDepth"></div><div style="font-size:24px;margin-top:5px">→</div></div>
+        <div><div class="mini" style="margin-bottom:7px">Yeni output channel</div><div class="output-map">feature #<span id="outFilterNo">1</span></div></div>
+      </div>
+      <div class="controls"><label class="mini">Output filter: <input id="filterSlider" type="range" min="1" max="32" value="1" step="1"> <b id="filterValue">1 / 32</b></label></div>
+      <div class="formula">output[k] =
+bias[k]
++ conv(input[0],  kernel[k,0])
++ conv(input[1],  kernel[k,1])
++ ...
++ conv(input[15], kernel[k,15])</div>
+      <div class="callout" style="margin-top:12px"><b>Yani:</b> 16 eski harita kaybolmuyor. Her yeni output feature map, onların öğrenilmiş ağırlıklı birleşiminden oluşuyor.</div>
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Neden pooling?</h3>
+    <p>MaxPool her 2×2 bölgede en güçlü aktivasyonu tutar. Böylece tam piksel konumunu biraz feda edip “bu bölgede bu özellik var” bilgisini korur.</p>
+    <div class="losskeep"><div><h4>Kısmen kaybettiğimiz</h4><div class="mini">Kesin koordinat · ince uzamsal ayrıntı · bazı zayıf aktivasyonlar</div></div><div><h4>Korumaya çalıştığımız</h4><div class="mini">Bölgesel özellik varlığı · güçlü aktivasyon · daha büyük şekil yapısı</div></div></div>
+    <h3 style="margin-top:18px">Neden kanal sayısı 16 → 32 → 64?</h3>
+    <p>Grid küçüldükçe her hücre daha büyük bir input bölgesini temsil eder. Buna karşılık daha fazla <b>özellik türü</b> taşıyabilmek için kanal sayısı artırılır: kabaca daha az hassas “nerede?”, daha zengin “ne var?” temsili.</p>
+    <div class="rf-grid"><div class="rf"><b>Input</b><span>1×64×64 · RF 1×1</span></div><div class="rf"><b>Conv1 + Pool</b><span>16×32×32 · RF 4×4</span></div><div class="rf"><b>Conv2 + Pool</b><span>32×16×16 · RF 10×10</span></div><div class="rf"><b>Conv3 + Pool</b><span>64×8×8 · RF 22×22</span></div></div>
+    <p class="mini" style="margin-top:10px"><b>Receptive field:</b> Bir feature-map hücresinin orijinal inputta etkilenebildiği alan. Derine indikçe büyür.</p>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Bu projede gerçek boyut zinciri</h3>
+    <div class="code">Input            1 × 64 × 64
+↓ Conv2d(1,16)   16 × 64 × 64
+↓ MaxPool         16 × 32 × 32
+
+↓ Conv2d(16,32)  32 × 32 × 32
+↓ MaxPool         32 × 16 × 16
+
+↓ Conv2d(32,64)  64 × 16 × 16
+↓ MaxPool         64 ×  8 ×  8
+
+↓ Flatten         4096
+↓ Linear          10 logits</div>
+    <p><code>Conv2d(16,32,3)</code> demek: <b>16 giriş kanalını birlikte kullanarak 32 yeni kanal üret.</b> Aynı mantık sonra <code>32 → 64</code> için tekrar eder.</p>
+    <p class="mini">“Bir filtre kulak öğrendi” gibi isimler kaynak kodunda yoktur; bunlar yalnızca sezgisel örneklerdir. Gerçek filtre davranışı activation/weight analiziyle incelenir.</p>
+  </div>
+</section>
+
+
+
+<section id="mentalmodel">
+  <div class="section-head">
+    <h2>03C · Sayılar nasıl “anlam” kazanıyor?</h2>
+    <p>Bu bölüm konuşmada oturttuğumuz ana fikri özetler: sayıların kendisi semantik değildir; eğitim, hangi aktivasyon kombinasyonlarının sınıflandırma için işe yaradığını öğrenir.</p>
+  </div>
+
+  <div class="card">
+    <div class="mental-flow">
+      <div class="mstep"><b>Piksel</b><span>Ham yoğunluk değeri</span><div class="arr">→</div></div>
+      <div class="mstep"><b>Conv1</b><span>Basit feature aktivasyonları</span><div class="arr">→</div></div>
+      <div class="mstep"><b>Conv2</b><span>Feature kombinasyonları</span><div class="arr">→</div></div>
+      <div class="mstep"><b>Conv3</b><span>Daha karmaşık ara temsil</span><div class="arr">→</div></div>
+      <div class="mstep"><b>Linear</b><span>Sınıf skorları / logits</span><div class="arr">→</div></div>
+      <div class="mstep"><b>Softmax</b><span>Olasılıklar</span></div>
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Model sayıların “anlamını” nasıl kullanıyor?</h3>
+    <p>Bir feature map hücresindeki <code>3.8</code> sayısı kendi başına “kulak” veya “tekerlek” anlamına gelmez. Anlam, <b>bu sayının hangi filtre tarafından, hangi spatial konumda ve hangi diğer feature aktivasyonlarıyla birlikte üretildiği</b> üzerinden oluşur.</p>
+
+    <div class="meaning-grid">
+      <div class="meaning-card">
+        <b>1 · İlk katman</b>
+        <span>Bir filtre belirli bir lokal pattern'e güçlü cevap verirse yüksek activation üretir.</span>
+      </div>
+      <div class="meaning-card">
+        <b>2 · Sonraki katman</b>
+        <span>Yeni filtre, önceki feature'ların belirli spatial kombinasyonlarını ağırlıklı olarak birleştirir.</span>
+      </div>
+      <div class="meaning-card">
+        <b>3 · Classifier</b>
+        <span>Son 4096 activation'ın hangi kombinasyonlarının cat/dog/car gibi sınıfları desteklediğini öğrenir.</span>
+      </div>
+    </div>
+
+    <div class="truthbox">
+      <b>İnsan gibi “feature #7 = kulak” diye etiketlemiyor.</b>
+      Training sırasında backpropagation, doğru sınıfı artıran ve hatayı azaltan weight kombinasyonlarını güçlendiriyor. Biz sonradan bazı feature'ların görsel olarak anlamlı pattern'lere duyarlı olduğunu yorumlayabiliyoruz.
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Bir bölgenin mantıksal dönüşümü</h3>
+    <div class="code">Bir bölgede Conv1 sonrası:
+
+F1 = 0.2
+F2 = 3.4
+F3 = 0.0
+F4 = 2.8
+...
+F16 = 0.5
+
+Bu = "16 feature'ın bu bölgede ne kadar aktive olduğu"
+
+↓ Conv2
+
+Yeni filter #1:
+önceki 16 channel × kendi 3×3×16 ağırlıkları
+→ yeni activation
+
+Yeni filter #2:
+aynı 16 channel × BAŞKA 3×3×16 ağırlıkları
+→ başka activation
+
+...
+
+→ 32 yeni feature map
+
+↓ Conv3
+
+32 ara feature'ın kombinasyonları
+→ 64 daha yüksek-seviye feature
+
+↓ Flatten + Linear
+
+64×8×8 = 4096 activation
+→ 10 ayrı ağırlıklı toplam
+→ 10 logit</div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Neden bu gerçekten işe yarıyor?</h3>
+    <p>Çünkü eğitim sırasında modelin bütün ağırlıkları aynı hedefe göre ayarlanıyor: <b>doğru sınıfın skorunu artır, yanlış sınıfların skorunu azalt.</b> Conv1'deki bir weight'in faydalı olup olmadığı bile en sonunda classification loss'a etkisine göre belirleniyor.</p>
+
+    <div class="code">drawing
+  ↓
+Conv1 weights
+  ↓
+Conv2 weights
+  ↓
+Conv3 weights
+  ↓
+Linear weights
+  ↓
+cat / dog / car / ...
+  ↓
+LOSS
+  ↓
+backpropagation
+  ↓
+bütün weight'leri küçük miktarlarda güncelle</div>
+
+    <p class="mini">Bu yüzden ara katmanların görevi önceden elle tanımlanmıyor. Ağ, final tahmini kolaylaştıracak ara temsil biçimini training sırasında öğreniyor.</p>
+  </div>
+</section>
+
+
+
+<section id="kernelmath">
+  <div class="section-head">
+    <h2>03D · 3×3 kernel 64×64'te nasıl geziyor?</h2>
+    <p>“3×3’leri topluyorsak neden tekrar 64×64 çıkıyor?” sorusunun tam cevabı: kernel her konuma kayar ve her konum için bir sayı üretir. Padding boyutu korur.</p>
+  </div>
+
+  <div class="math-lab">
+    <div class="card matrix-card">
+      <h3 style="margin-top:0">Kernel kaydırma simülasyonu</h3>
+      <p class="mini">5×5 örnek üzerinde 3×3 kernel kullanıyoruz. <code>padding=1</code> sayesinde output yine 5×5 kalıyor.</p>
+      <div id="slideInput"></div>
+      <div class="controls">
+        <button class="btn" id="slidePrev">← Önceki</button>
+        <button class="btn primary" id="slideNext">Sonraki →</button>
+        <button class="btn" id="slideAuto">▶ Otomatik tara</button>
+        <span class="mini">Position: <b id="slidePos">0,0</b></span>
+      </div>
+      <div class="anim-note">Her adımda tek bir output hücresi doluyor:</div>
+      <div class="output-build" id="outputBuild"></div>
+    </div>
+
+    <div class="card matrix-card">
+      <h3 style="margin-top:0">Tek hücre nasıl hesaplanıyor?</h3>
+      <div class="kernelbox">
+        <div class="kernelcell">1</div><div class="kernelcell">0</div><div class="kernelcell">-1</div>
+        <div class="kernelcell">1</div><div class="kernelcell">0</div><div class="kernelcell">-1</div>
+        <div class="kernelcell">1</div><div class="kernelcell">0</div><div class="kernelcell">-1</div>
+      </div>
+      <div class="calcbox" id="slideCalc"></div>
+      <div class="lesson-note"><b>Bir konum → bir sayı.</b> Kernel bütün geçerli konumları gezdiğinde bu sayılar yan yana ve alt alta yerleşerek yeni feature map’i oluşturur.</div>
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Output boyutu formülü</h3>
+    <div class="equation-block">output_size = floor((N + 2P - K) / S) + 1
+
+N = input boyutu
+P = padding
+K = kernel boyutu
+S = stride</div>
+
+    <div class="meaning-grid">
+      <div class="meaning-card"><b>Padding yok</b><span>(64 - 3)/1 + 1 = 62 → 64×64, 62×62 olur.</span></div>
+      <div class="meaning-card"><b>padding=1</b><span>(64 + 2 - 3)/1 + 1 = 64 → boyut korunur.</span></div>
+      <div class="meaning-card"><b>Stride</b><span>Kernel’in her adımda kaç piksel kaydığını söyler. Burada stride=1.</span></div>
+    </div>
+
+    <p class="mini" style="margin-top:12px">Senin modelindeki convolution’larda <code>padding=1</code> var; bu yüzden her convolution uzamsal boyutu koruyor. Boyutu asıl yarıya indiren katman <code>MaxPool2d(2)</code>.</p>
+  </div>
+</section>
+
+<section id="relu-pool-bias">
+  <div class="section-head">
+    <h2>03E · ReLU, MaxPool ve Bias olmasa ne olur?</h2>
+    <p>Bu üçü farklı görev yapar: Bias eşik/offset sağlar, ReLU non-linearity ekler, MaxPool ise spatial çözünürlüğü küçültür.</p>
+  </div>
+
+  <div class="triptych">
+    <div class="card concept-card">
+      <h3>Bias</h3>
+      <div class="big">+ b</div>
+      <p>Convolution sonucu yalnızca ağırlıklı toplam değildir. Her output channel’ın kendi bias değeri vardır.</p>
+      <div class="equation-block">z = weighted_sum + bias
+
+örnek:
+weighted_sum = 2.7
+bias = -0.5
+
+z = 2.2</div>
+      <div class="lesson-note">Bias, filtreye bir tür öğrenilebilir offset/eşik esnekliği verir.</div>
+    </div>
+
+    <div class="card concept-card">
+      <h3>ReLU</h3>
+      <div class="big">max(0,x)</div>
+      <p>Negatif aktivasyonları sıfırlar ve ağa non-linearity kazandırır.</p>
+      <div class="equation-block">önce:
+[-3.2, 1.5, -0.7, 4.1]
+
+ReLU sonrası:
+[0, 1.5, 0, 4.1]</div>
+      <div class="lesson-note">ReLU olmazsa convolution katmanları arasındaki ifade gücü azalır. Bu modelde MaxPool hâlâ nonlinear olsa da ReLU standart ve önemli bir nonlinear dönüşümdür.</div>
+    </div>
+
+    <div class="card concept-card">
+      <h3>MaxPool</h3>
+      <div class="big">2×2 → 1</div>
+      <p>Her 2×2 bölgede maksimum aktivasyonu tutar. Kanal sayısını değiştirmez.</p>
+      <div class="equation-block">1 4
+5 2
+
+→ max = 5</div>
+      <div class="lesson-note">64×64 → 32×32 olur. Kesin konum bilgisinden biraz vazgeçip daha kompakt bir temsil elde ederiz.</div>
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>MaxPool olmasaydı?</h3>
+    <table class="compare-table">
+      <tr><th></th><th>Pooling ile</th><th>Pooling olmadan</th></tr>
+      <tr><td>Son feature tensor</td><td>64×8×8</td><td>64×64×64</td></tr>
+      <tr><td>Flatten boyutu</td><td>4,096</td><td>262,144</td></tr>
+      <tr><td>Spatial detail</td><td>Daha kaba</td><td>Çok yüksek</td></tr>
+      <tr><td>Hesaplama / classifier maliyeti</td><td>Daha düşük</td><td>Çok daha yüksek</td></tr>
+    </table>
+    <p class="mini">Pooling lossy’dir; bilgi kaybeder. Kazanç: daha düşük hesaplama, daha kompakt temsil ve küçük konum değişimlerine bir miktar tolerans.</p>
+  </div>
+</section>
+
+<section id="channelsfilters">
+  <div class="section-head">
+    <h2>03F · Channel, filter ve output neden aynı şey değil?</h2>
+    <p>Bu ayrım CNN’in en sık karıştırılan kısmı. Özellikle <code>Conv2d(16,32,3)</code> ifadesini doğru okumak burada oturuyor.</p>
+  </div>
+
+  <div class="card detail">
+    <h3>Conv2d(16,32,3) nasıl okunur?</h3>
+    <div class="filter-demo">
+      <div class="filter-bank">
+        <div class="filter-pill"><b>16 input channel</b></div>
+        <div class="filter-pill">feature map 1</div>
+        <div class="filter-pill">feature map 2</div>
+        <div class="filter-pill">...</div>
+        <div class="filter-pill">feature map 16</div>
+      </div>
+      <div style="text-align:center;font-size:26px">→</div>
+      <div>
+        <div class="mini" style="margin-bottom:7px">32 farklı output filter</div>
+        <div class="outputbank">
+          <div class="omap">F1</div><div class="omap">F2</div><div class="omap">F3</div><div class="omap">F4</div>
+          <div class="omap">F5</div><div class="omap">...</div><div class="omap">F31</div><div class="omap">F32</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="equation-block" style="margin-top:14px">Tek output filter'ın weight şekli:
+16 × 3 × 3
+
+Tek output hücresi için kullanılan input activation sayısı:
+16 × 3 × 3 = 144
+
+32 farklı filter olduğu için:
+32 farklı output feature map oluşur.</div>
+
+    <div class="truthbox">
+      <b>Neden 32’si aynı olmuyor?</b>
+      Çünkü her filter’ın öğrenilmiş weight’leri ve bias’ı farklı. Hepsi aynı 16 input channel’a bakıyor, ama farklı ağırlıklarla farklı kombinasyonlar arıyor.
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>A ve B örneğindeki düzeltme</h3>
+    <p>Önceki konuşmadaki küçük örnekte <b>A ve B iki farklı filter değil, iki farklı input channel</b> idi. Bir output filter’ın A için ayrı 3×3 kernel dilimi, B için ayrı 3×3 kernel dilimi vardı.</p>
+    <div class="equation-block">örnek: 2 input channel
+
+output[k] =
+conv(A, kernel[k,A])
++
+conv(B, kernel[k,B])
++
+bias[k]
+
+Gerçek Conv2:
+A,B yerine 16 input channel vardır.</div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Tek bir output değeri nasıl oluşuyor?</h3>
+    <div class="tiny-flow">
+      <div class="tiny-step">1. Output konumunu seç: örneğin (x=10, y=12)</div>
+      <div class="tiny-step">2. Önceki 16 channel’ın her birinden o konum çevresindeki 3×3 bölgeyi al</div>
+      <div class="tiny-step">3. Her 3×3 bölgeyi filter’ın o channel’a ait 3×3 weight slice’ı ile çarp</div>
+      <div class="tiny-step">4. 16 channel contribution’ını topla</div>
+      <div class="tiny-step">5. Bias ekle</div>
+      <div class="tiny-step">6. ReLU uygula</div>
+      <div class="tiny-step">7. Sonuç = o yeni feature map’in (x,y) hücresi</div>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="animated-intuition">
+  <div class="section-head">
+    <h2>03G · Aynı işlemi hareket halinde düşün</h2>
+    <p>Bu animasyonlar sayısal işlemleri “hangi bilginin nereye aktarıldığı” açısından gösterir.</p>
+  </div>
+
+  <div class="triptych">
+    <div class="card concept-card">
+      <h3>ReLU: negatifleri kapat</h3>
+      <div class="relu-line">
+        <div class="relu-bar neg" style="--h:70px"></div>
+        <div class="relu-bar on" style="--h:42px"></div>
+        <div class="relu-bar neg" style="--h:36px"></div>
+        <div class="relu-bar on" style="--h:88px"></div>
+        <div class="relu-bar on" style="--h:26px"></div>
+      </div>
+      <div class="anim-row"><span>-3.2</span><span>1.5</span><span>-0.7</span><span>4.1</span><span>0.3</span></div>
+      <div class="anim-arrow">↓</div>
+      <div class="equation-block">[0, 1.5, 0, 4.1, 0.3]</div>
+      <p class="mini">Negatif aktivasyonlar sıfıra kapanır; pozitif sinyaller sonraki katmana geçer.</p>
+    </div>
+
+    <div class="card concept-card">
+      <h3>MaxPool: bölgedeki güçlü sinyali koru</h3>
+      <div class="anim-row">
+        <div class="pool-demo">
+          <div class="p">1</div><div class="p">4</div>
+          <div class="p max">5</div><div class="p">2</div>
+        </div>
+        <div class="anim-arrow">→</div>
+        <div class="pool-result">5</div>
+      </div>
+      <p class="mini">Bu işlem her 2×2 bölge için tekrarlanır; spatial çözünürlük yarıya iner.</p>
+    </div>
+
+    <div class="card concept-card">
+      <h3>16 channel → 1 yeni feature</h3>
+      <div class="channel-river" id="channelRiver">
+        <div class="channel-token">C1</div><div class="channel-token">C2</div><div class="channel-token">C3</div><div class="channel-token">C4</div>
+        <div class="channel-token">C5</div><div class="channel-token">C6</div><div class="channel-token">C7</div><div class="channel-token">C8</div>
+        <div class="channel-token">C9</div><div class="channel-token">C10</div><div class="channel-token">C11</div><div class="channel-token">C12</div>
+        <div class="channel-token">C13</div><div class="channel-token">C14</div><div class="channel-token">C15</div><div class="channel-token">C16</div>
+      </div>
+      <div class="mix-center">weighted sum</div>
+      <div class="output-map">new feature</div>
+      <p class="mini">Her input channel kendi 3×3 kernel slice’ı ile katkı yapar; katkılar toplanır.</p>
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Feature hiyerarşisi</h3>
+    <div class="hierarchy">
+      <div class="hier"><b>Input</b><div class="symbol">••••</div><span class="mini">Ham piksel yoğunlukları</span></div>
+      <div class="hier"><b>Conv1</b><div class="symbol">/ \ — |</div><span class="mini">Basit lokal pattern aktivasyonları</span></div>
+      <div class="hier"><b>Conv2</b><div class="symbol">∠ ∧ ⌒</div><span class="mini">Basit feature kombinasyonları</span></div>
+      <div class="hier"><b>Conv3</b><div class="symbol">⌂ ◉ ✦</div><span class="mini">Daha büyük ve karmaşık ara temsiller</span></div>
+    </div>
+    <div class="lesson-note"><b>Not:</b> Bunlar gerçek filtrelere verilmiş isimler değildir; sadece hiyerarşik representation learning mantığını sezgisel göstermek içindir.</div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Farklı output filter’lar neden farklı sonuç verir?</h3>
+    <p class="mini">Aynı input activation’larına bakabilirler ama weight’leri farklıdır.</p>
+    <div class="weight-bars">
+      <div class="wbar"><span>Filter #1</span><div class="wtrack"><div class="wfill" style="--w:82%"></div></div><b>2.1</b></div>
+      <div class="wbar"><span>Filter #2</span><div class="wtrack"><div class="wfill" style="--w:54%"></div></div><b>3.6</b></div>
+      <div class="wbar"><span>Filter #3</span><div class="wtrack"><div class="wfill" style="--w:31%"></div></div><b>0.8</b></div>
+      <div class="wbar"><span>Filter #4</span><div class="wtrack"><div class="wfill" style="--w:68%"></div></div><b>2.9</b></div>
+    </div>
+    <p class="mini">Dolayısıyla 32 output channel aynı inputtan üretilse de her biri farklı “hangi kombinasyona tepki vermeliyim?” fonksiyonu öğrenir.</p>
+  </div>
+</section>
+
+
+  <section id="softmax">
+    <div class="section-head"><h2>04 · Logit ≠ olasılık</h2><p>Slider'ları değiştir. Softmax'ın skorları pozitif ve toplamı 1 olan olasılıklara dönüştürmesini gör.</p></div>
+    <div class="grid2">
+      <div class="card soft"><div class="logits" id="logits"></div></div>
+      <div class="card soft">
+        <h3 style="margin-top:0">Softmax sonucu</h3>
+        <div class="mini">Formül: exp(logitᵢ) / Σ exp(logitⱼ). Sayısal kararlılık için önce en büyük logiti çıkarıyoruz.</div>
+        <div class="probs" id="probs"></div>
+        <div class="callout" style="margin-top:14px"><b>Önemli:</b> Buradaki slider'lar öğretim simülasyonu. Yüklediğin gerçek modelin checkpoint ağırlıkları bu HTML dosyasına gömülü değil.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="data">
+    <div class="section-head"><h2>05 · Veri seti neden bu kadar sıkı doğrulanıyor?</h2><p>data.py yalnızca veri yüklemiyor; eğitim ve inference arasında sessiz uyuşmazlıkları önlemeye çalışıyor.</p></div>
+    <div class="grid2">
+      <div class="card detail">
+        <h3>Dataset contract</h3>
+        <div class="steps">
+          <div class="step"><b>Class mapping</b> — Dosyadaki sınıf sırası config'teki 10 sınıfla aynı olmalı.</div>
+          <div class="step"><b>Preprocessing version</b> — Dataset hangi preprocessing reçetesiyle üretildiyse checkpoint de aynı reçeteyi beklemeli.</div>
+          <div class="step"><b>Shape / dtype</b> — Görseller <code>[N,1,64,64]</code> ve <code>float32</code> olmalı.</div>
+          <div class="step"><b>Range</b> — Değerler finite ve 0–1 aralığında olmalı.</div>
+          <div class="step"><b>IDs</b> — Her örneğin benzersiz kimliği olmalı; duplicate engelleniyor.</div>
+          <div class="step"><b>Labels</b> — Tüm sınıflar 0…9 aralığında temsil edilmeli.</div>
+        </div>
+      </div>
+      <div class="card detail">
+        <h3>70 / 15 / 15 split</h3>
+        <p class="mini">Her sınıf kendi içinde ayrı ayrı karıştırılıyor. Sonra yaklaşık %70 train, %15 validation, %15 test yapılıyor. Bu <span class="term" data-term="stratified">stratified split</span> yaklaşımıdır.</p>
+        <div class="code">for each class c:
+    indices = samples_where(label == c)
+    shuffle(indices, seed=42)
+
+    train      = first 70%
+    validation = next 15%
+    test       = last 15%</div>
+        <p class="mini"><b>Seed=42</b> olduğu için aynı dataset ile tekrar çalıştırdığında aynı split'i elde edersin: bu da <span class="term" data-term="deterministic">deterministic</span> davranıştır.</p>
+      </div>
+    </div>
+  </section>
+
+<section id="training">
+  <div class="section-head">
+    <h2>05 · Model weight'leri nasıl öğreniyor?</h2>
+    <p>Repo’daki gerçek eğitim döngüsü: <code>CrossEntropyLoss → loss.backward() → gradients → Adam → weight update</code>.</p>
+  </div>
+
+  <div class="training-grid">
+    <div class="card train-card">
+      <h3 style="margin-top:0">Forward pass → loss → backward pass</h3>
+
+      <div class="train-pipeline">
+        <div class="train-node" data-stage="input">Drawing</div>
+        <div class="train-arrow">→</div>
+        <div class="train-node" data-stage="conv">CNN</div>
+        <div class="train-arrow">→</div>
+        <div class="train-node" data-stage="logits">10 logits</div>
+        <div class="train-arrow">→</div>
+        <div class="train-node" data-stage="loss">CrossEntropyLoss</div>
+      </div>
+
+      <div class="train-pipeline backward" style="margin-top:12px">
+        <div class="train-node" data-stage="update">Adam update</div>
+        <div class="train-arrow">→</div>
+        <div class="train-node" data-stage="grad">Gradients</div>
+        <div class="train-arrow">→</div>
+        <div class="train-node" data-stage="back">loss.backward()</div>
+      </div>
+
+      <div class="controls">
+        <button class="btn primary" id="trainStep">▶ Bir training step çalıştır</button>
+      </div>
+      <div class="mini" id="trainStatus">Hazır.</div>
+
+      <div class="lesson-note">
+        <b>Forward:</b> mevcut weight’lerle tahmin üret.<br>
+        <b>Loss:</b> tahmin ile gerçek label arasındaki hatayı ölç.<br>
+        <b>Backward:</b> her weight’in bu hataya katkısını gradient ile hesapla.<br>
+        <b>Adam:</b> weight’leri hatayı azaltacak yönde küçük miktarda değiştir.
+      </div>
+    </div>
+
+    <div class="card train-card">
+      <h3 style="margin-top:0">Örnek training durumu: gerçek label = cat</h3>
+      <div class="prob-sim" id="trainProbs"></div>
+
+      <div class="loss-meter"><div class="loss-fill" id="lossFill"></div></div>
+
+      <div class="metric-grid">
+        <div class="metric-card"><b id="lossValue">1.82</b><span>CrossEntropy loss</span></div>
+        <div class="metric-card"><b id="catProb">12%</b><span>cat probability</span></div>
+        <div class="metric-card"><b id="topPred">dog</b><span>top prediction</span></div>
+        <div class="metric-card"><b id="stepNo">0</b><span>training steps</span></div>
+      </div>
+
+      <p class="mini" style="margin-top:12px">
+        Bu olasılık/loss değerleri öğretim simülasyonu. Repo’daki gerçek eğitim mantığını gösteriyor; gerçek koşu değerleri <code>history.json</code> içinden gelir.
+      </p>
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Bir kernel weight’i nasıl değişiyor?</h3>
+    <p>
+      Başta kernel sayıları rastgele/başlangıç değerleridir. Classification hatası geriye taşındığında
+      Conv1’deki bir weight’in bile loss’u ne yönde etkilediği hesaplanır.
+    </p>
+
+    <div class="weight-demo" id="weightDemo">
+      <div class="weight-cell" data-base="0.21">w₁ = 0.210</div>
+      <div class="weight-cell" data-base="-0.14">w₂ = -0.140</div>
+      <div class="weight-cell" data-base="0.37">w₃ = 0.370</div>
+      <div class="weight-cell" data-base="0.08">w₄ = 0.080</div>
+      <div class="weight-cell" data-base="-0.29">w₅ = -0.290</div>
+      <div class="weight-cell" data-base="0.16">w₆ = 0.160</div>
+      <div class="weight-cell" data-base="0.31">w₇ = 0.310</div>
+      <div class="weight-cell" data-base="-0.05">w₈ = -0.050</div>
+      <div class="weight-cell" data-base="0.12">w₉ = 0.120</div>
+    </div>
+
+    <div class="equation-block" style="margin-top:12px">Forward:
+input → Conv1 → Conv2 → Conv3 → Linear → logits
+
+Loss:
+CrossEntropyLoss(logits, true_label)
+
+Backward:
+∂Loss/∂w₁, ∂Loss/∂w₂, ... hesaplanır
+
+Optimizer:
+Adam gradient'leri kullanarak weight'leri günceller</div>
+
+    <div class="truthbox">
+      Model “bu kernel kedi kulağı olsun” diye programlanmaz.
+      <b>Doğru sınıflandırmayı kolaylaştıran ara feature’lar, loss’u azaltan weight güncellemeleri sonucunda ortaya çıkar.</b>
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Repo’daki gerçek training ayarları</h3>
+    <div class="meaning-grid">
+      <div class="meaning-card"><b>Optimizer</b><span>Adam</span></div>
+      <div class="meaning-card"><b>Loss</b><span>CrossEntropyLoss</span></div>
+      <div class="meaning-card"><b>Learning rate</b><span>0.001</span></div>
+      <div class="meaning-card"><b>Batch size</b><span>64</span></div>
+      <div class="meaning-card"><b>Epoch</b><span>Varsayılan 10</span></div>
+      <div class="meaning-card"><b>Seed</b><span>42</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="splits">
+  <div class="section-head">
+    <h2>06 · Train / validation / test neden ayrı?</h2>
+    <p>Repo her sınıfın örneklerini ayrı ayrı karıştırıp yaklaşık <b>%70 / %15 / %15</b> bölüyor.</p>
+  </div>
+
+  <div class="card detail">
+    <div class="splitbar">
+      <div class="trainseg">70% TRAIN</div>
+      <div class="valseg">15% VAL</div>
+      <div class="testseg">15% TEST</div>
+    </div>
+
+    <div class="split-controls">
+      <button class="splitbtn active" data-split="train">Train</button>
+      <button class="splitbtn" data-split="validation">Validation</button>
+      <button class="splitbtn" data-split="test">Test</button>
+    </div>
+
+    <div class="split-explain" id="splitExplain">
+      <b>Train:</b> Weight’lerin gerçekten güncellendiği veri. Gradient ve optimizer sadece burada çalışır.
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Validation ne işe yarıyor?</h3>
+    <p>
+      Her epoch sonunda model <code>eval()</code> moduna alınır ve validation setinde loss/accuracy ölçülür.
+      Validation sırasında <b>weight güncellenmez</b>.
+    </p>
+
+    <div class="epoch-row"><span>Epoch 1</span><div class="epoch-track"><div class="epoch-fill" style="--w:82%"></div></div><b>1.42</b></div>
+    <div class="epoch-row"><span>Epoch 2</span><div class="epoch-track"><div class="epoch-fill" style="--w:64%"></div></div><b>1.08</b></div>
+    <div class="epoch-row"><span>Epoch 3</span><div class="epoch-track"><div class="epoch-fill" style="--w:48%"></div></div><b>0.81</b></div>
+    <div class="epoch-row"><span>Epoch 4</span><div class="epoch-track"><div class="epoch-fill" style="--w:53%"></div></div><b>0.89</b></div>
+
+    <div class="checkpoint-badge">best.pt → örnekte Epoch 3</div>
+
+    <div class="lesson-note">
+      Repo’nun gerçek kuralı: <b>validation loss şimdiye kadarki en düşük değerse checkpoint’i kaydet.</b>
+      Yukarıdaki loss sayıları yalnızca görsel örnektir.
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Test neden en sona saklanıyor?</h3>
+    <div class="eval-flow">
+      <div class="eval-step"><b>Train</b><span class="mini">Weight’leri öğren</span></div>
+      <div class="eval-step"><b>Validation</b><span class="mini">En iyi checkpoint’i seç</span></div>
+      <div class="eval-step"><b>Test</b><span class="mini">Final tarafsız ölçüm</span></div>
+      <div class="eval-step"><b>Report</b><span class="mini">Genelleme performansı</span></div>
+    </div>
+
+    <div class="truthbox">
+      Test setine bakarak model/hyperparameter seçersen, test seti artık gerçekten “görülmemiş final sınav” olmaktan çıkar.
+    </div>
+  </div>
+</section>
+
+<section id="evaluation">
+  <div class="section-head">
+    <h2>07 · Model gerçekten iyi mi? Evaluation</h2>
+    <p>Repo yalnızca accuracy değil; sınıf bazında precision, recall, F1, confusion matrix, confidence histogram ve temsilî hatalar da çıkarıyor.</p>
+  </div>
+
+  <div class="training-grid">
+    <div class="card detail">
+      <h3 style="margin-top:0">Metrikler neyi soruyor?</h3>
+      <div class="metric-grid">
+        <div class="metric-card"><b>Accuracy</b><span>Tüm örneklerin yüzde kaçı doğru?</span></div>
+        <div class="metric-card"><b>Precision</b><span>“cat” dediğim örneklerin kaçı gerçekten cat?</span></div>
+        <div class="metric-card"><b>Recall</b><span>Gerçek cat’lerin kaçını yakaladım?</span></div>
+        <div class="metric-card"><b>F1</b><span>Precision + recall dengesi</span></div>
+      </div>
+    </div>
+
+    <div class="card detail">
+      <h3 style="margin-top:0">Mini confusion matrix</h3>
+      <div class="cm">
+        <div class="diag">18</div><div>2</div><div>0</div><div>0</div>
+        <div>1</div><div class="diag">17</div><div>1</div><div>1</div>
+        <div>0</div><div>1</div><div class="diag">19</div><div>0</div>
+        <div>0</div><div>2</div><div>1</div><div class="diag">17</div>
+      </div>
+      <p class="mini">
+        Diagonal hücreler doğru tahminlerdir. Diagonal dışındaki hücreler modelin hangi sınıfları birbirine karıştırdığını gösterir.
+      </p>
+    </div>
+  </div>
+
+  <div class="card detail" style="margin-top:16px">
+    <h3>Repo’nun evaluation çıktıları</h3>
+    <div class="eval-flow">
+      <div class="eval-step"><b>metrics_*.json</b><span class="mini">accuracy + per-class metrics</span></div>
+      <div class="eval-step"><b>confusion_*.png</b><span class="mini">hangi sınıflar karışıyor?</span></div>
+      <div class="eval-step"><b>confidence_*.png</b><span class="mini">model ne kadar yüksek probability veriyor?</span></div>
+      <div class="eval-step"><b>mistakes_*.png</b><span class="mini">temsilî yanlış tahminler</span></div>
+    </div>
+
+    <div class="lesson-note">
+      <b>Önemli sınır:</b> Softmax probability “gerçek dünyadaki kesinlik” değildir.
+      Ayrıca activation görselleri de açıklama değildir; modelin gerçek ara tensor değerlerinin görselleştirilmesidir.
+    </div>
+  </div>
+</section>
+
+
+<section id="rebuild">
+    <div class="section-head"><h2>08 · Bunu sıfırdan tekrar nasıl kurarsın?</h2><p>Bu sıra önemli. Önce “data contract + preprocessing”, sonra model, sonra eğitim, en son model akışı/UI.</p></div>
+    <div class="rebuild">
+      <div class="card recipe"><div class="num">1</div><h3>Problem contract'ını sabitle</h3><p>Sınıflar, input boyutu, dosya yolları. Tek bir config dosyası tüm bileşenlerin ortak gerçeği olsun.</p><details><summary>Kontrol listesi</summary><div class="mini">CLASSES · INPUT_SIZE · checkpoint path · dataset path</div></details></div>
+      <div class="card recipe"><div class="num">2</div><h3>Preprocessing'i önce yaz</h3><p>Training ve gerçek kullanıcı girdisi aynı fonksiyondan geçmeli. Aksi halde “training-serving skew” oluşur.</p><details><summary>Bu projedeki reçete</summary><div class="mini">validate → bbox → center → scale → supersample → resize → /255 → channel dimension</div></details></div>
+      <div class="card recipe"><div class="num">3</div><h3>Dataset'i versionla</h3><p>Görüntü, label, ID, class mapping ve preprocessing version'ını aynı NPZ içine koy.</p><details><summary>Neden?</summary><div class="mini">Eski dataset + yeni preprocessing gibi sessiz hataları yükleme anında yakalarsın.</div></details></div>
+      <div class="card recipe"><div class="num">4</div><h3>Train/validation/test ayır</h3><p>Split'i sınıf bazında ve sabit seed ile yap. Test setine model seçerken dokunma.</p><details><summary>Roller</summary><div class="mini">Train: ağırlıkları öğrenir · Validation: model/hyperparameter seçimi · Test: final tarafsız ölçüm</div></details></div>
+      <div class="card recipe"><div class="num">5</div><h3>CNN'i kur</h3><p>3 Conv bloğu ile feature çıkar, flatten et, linear layer ile 10 logit üret.</p><details><summary>Boyut zinciri</summary><div class="mini">1×64×64 → 16×32×32 → 32×16×16 → 64×8×8 → 4096 → 10</div></details></div>
+      <div class="card recipe"><div class="num">6</div><h3>Eğit ve checkpoint kaydet</h3><p>Sadece model ağırlığını değil class mapping, input_size ve preprocessing_version metadata'sını da checkpoint'e koy.</p><details><summary>Checkpoint zihinsel modeli</summary><div class="mini">Model mimarisi = boş makine · state_dict = öğrenilmiş düğme ayarları · metadata = bu ayarların hangi dünyaya ait olduğu</div></details></div>
+      <div class="card recipe"><div class="num">7</div><h3>Inference fonksiyonunu kur</h3><p>eval() + inference_mode() → feature extractor → classifier → softmax → top-k.</p><details><summary>Eval neden?</summary><div class="mini">Dropout gibi eğitim davranışlarını kapatır ve tahmini deterministik hale getirir.</div></details></div>
+      <div class="card recipe"><div class="num">8</div><h3>model akışı ve UI ekle</h3><p>Modeli doğrulanmış bir input tensörüyle çalıştır, çıktıları görselleştir ve ara feature map’leri incele.</p><details><summary>Temel adım'ler</summary><div class="mini">input tensor → model.eval() → inference_mode() → logits → softmax</div></details></div>
+    </div>
+  </section>
+
+  <section id="terms">
+    <div class="section-head"><h2>09 · Terim sözlüğü</h2><p>Kodda tekrar karşılaşacağın temel kavramlar.</p></div>
+    <div class="glossary" id="glossary"></div>
+  </section>
+  <footer>SketchCNN Interactive Explainer · Kaynak koduna göre hazırlanmıştır.</footer>
+</main>
+</div>
+
+<div class="modal" id="modal"><div class="modal-card"><button class="x" id="modalX">×</button><h3 id="modalTitle"></h3><p id="modalBody"></p></div></div>
+
+<script>
+const classes=['cat','dog','car','tree','house','fish','airplane','chair','apple','star'];
+
+const pipelineText={
+ stroke:'<strong>Stroke:</strong> Tarayıcı resmi PNG olarak değil, kalemin izini ayrı ayrı çizgiler halinde x ve y koordinat dizileri olarak sunucuya gönderir.',
+ prep:'<strong>Preprocess:</strong> Çizimin yeri ve boyutu standartlaştırılır; beyaz çizgili 64×64 görüntü oluşturulur. Eğitimde kullanılan temsil ile tarayıcı girdisi aynı rasterizer’dan geçer.',
+ tensor:'<strong>Tensor:</strong> PyTorch’un modele verdiği sayısal yapı. Bu projede tek örnek önce [1,64,64], batch boyutu eklenince [1,1,64,64] olur.',
+ features:'<strong>Features:</strong> Üç convolution bloğu çizginin ham piksellerini giderek daha soyut özellik haritalarına dönüştürür. Son şekil 64×8×8’dir.',
+ logits:'<strong>Logits:</strong> Modelin 10 sınıf için ürettiği ham, normalize edilmemiş skorlar. Negatif veya 1’den büyük olabilirler; olasılık değildir.',
+ prob:'<strong>Softmax:</strong> 10 logiti birbirleriyle karşılaştırıp pozitif, toplamı 1 olan değerlere dönüştürür.',
+ json:'<strong>çıktı:</strong> model akışı; top-5 tahminleri, tüm olasılıkları, preprocessing önizlemesini, ilk feature map’leri ve latency ölçümlerini tarayıcıya döndürür.'
+};
+document.querySelectorAll('.node').forEach(n=>n.onclick=()=>{
+ document.querySelectorAll('.node').forEach(x=>x.classList.remove('active'));n.classList.add('active');
+ document.getElementById('pipelineExplain').innerHTML=pipelineText[n.dataset.key];
+});
+
+// Drawing + simple JS recreation of bbox-center-scale visualization
+const dc=document.getElementById('drawCanvas'), dctx=dc.getContext('2d');
+const pc=document.getElementById('prepCanvas'), pctx=pc.getContext('2d');
+dctx.strokeStyle='#fff';dctx.lineWidth=6;dctx.lineCap='round';dctx.lineJoin='round';
+let strokes=[], current=null, drawing=false;
+function pos(e){const r=dc.getBoundingClientRect();return [(e.clientX-r.left)*dc.width/r.width,(e.clientY-r.top)*dc.height/r.height]}
+dc.addEventListener('pointerdown',e=>{drawing=true;current=[[],[]];strokes.push(current);const [x,y]=pos(e);current[0].push(x);current[1].push(y);dctx.beginPath();dctx.moveTo(x,y);stats();dc.setPointerCapture(e.pointerId)});
+dc.addEventListener('pointermove',e=>{if(!drawing)return;const [x,y]=pos(e);current[0].push(x);current[1].push(y);dctx.lineTo(x,y);dctx.stroke();stats()});
+dc.addEventListener('pointerup',()=>drawing=false);dc.addEventListener('pointercancel',()=>drawing=false);
+function stats(){const pts=strokes.reduce((s,a)=>s+a[0].length,0);document.getElementById('strokeStats').textContent=`${strokes.length} stroke · ${pts} point`}
+function clearAll(){strokes=[];current=null;dctx.clearRect(0,0,dc.width,dc.height);pctx.clearRect(0,0,pc.width,pc.height);stats()}
+document.getElementById('clearBtn').onclick=clearAll;
+function preprocess(){
+ pctx.clearRect(0,0,pc.width,pc.height); if(!strokes.length)return;
+ let xs=[],ys=[];strokes.forEach(s=>{xs.push(...s[0]);ys.push(...s[1])});
+ let minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+ let span=Math.max(maxx-minx,maxy-miny,1e-8), scale=(64-12)/span, cx=(minx+maxx)/2,cy=(miny+maxy)/2;
+ // Draw to 256 native coordinates (4x 64), then browser canvas displays it smoothly.
+ pctx.save(); pctx.scale(pc.width/256,pc.height/256); pctx.strokeStyle='#fff';pctx.fillStyle='#fff';pctx.lineWidth=8;pctx.lineCap='round';pctx.lineJoin='round';
+ strokes.forEach(s=>{pctx.beginPath();s[0].forEach((x,i)=>{let nx=((x-cx)*scale+32)*4, ny=((s[1][i]-cy)*scale+32)*4;i?pctx.lineTo(nx,ny):pctx.moveTo(nx,ny)});pctx.stroke()});
+ pctx.restore();
+}
+document.getElementById('prepBtn').onclick=preprocess;
+
+
+// Resolution/channel interactive explainer
+const stageDefs = [
+ {name:'Input', c:1, h:64, rf:1, text:'Ham çizim: yüksek uzamsal ayrıntı, tek kanal.'},
+ {name:'Conv1', c:16, h:64, rf:3, text:'Convolution çözünürlüğü koruyor ve 16 farklı feature map üretiyor.'},
+ {name:'Pool1', c:16, h:32, rf:4, text:'Pooling her feature map’i ayrı ayrı yarıya indiriyor; kanal sayısı değişmiyor.'},
+ {name:'Conv2', c:32, h:32, rf:8, text:'Her yeni Conv2 filtresi önceki 16 kanalın tamamını kullanıp 32 yeni haritadan birini üretir.'},
+ {name:'Pool2', c:32, h:16, rf:10, text:'Spatial grid tekrar küçülüyor; her hücre inputta daha geniş bir bölgeyi temsil ediyor.'},
+ {name:'Conv3', c:64, h:16, rf:18, text:'Conv3 önceki 32 kanalın kombinasyonlarından 64 yeni feature map çıkarıyor.'},
+ {name:'Pool3', c:64, h:8, rf:22, text:'Son feature tensor: 64×8×8. Konum daha kaba, özellik temsili daha zengin.'}
+];
+const sc=document.getElementById('stageControls');
+stageDefs.forEach((s,i)=>{const b=document.createElement('button');b.className='stagebtn'+(i===0?' active':'');b.textContent=s.name;b.dataset.i=i;sc.appendChild(b)});
+function renderStage(i){
+ const s=stageDefs[i];
+ document.querySelectorAll('.stagebtn').forEach((b,j)=>b.classList.toggle('active',j===i));
+ const pg=document.getElementById('pixelGrid');const shown=Math.min(s.h,16);pg.style.gridTemplateColumns=`repeat(${shown},1fr)`;pg.innerHTML='';
+ for(let n=0;n<shown*shown;n++)pg.appendChild(document.createElement('span'));
+ const st=document.getElementById('channelStack');st.innerHTML='';const layers=Math.min(s.c,8);
+ for(let k=0;k<layers;k++){const d=document.createElement('div');d.className='sheet';d.style.left=(k*7)+'px';d.style.top=(k*7)+'px';d.style.zIndex=k;if(k===layers-1)d.textContent=`${s.c} channel${s.c>1?'s':''}`;st.appendChild(d)}
+ document.getElementById('mShape').textContent=`${s.c}×${s.h}×${s.h}`;
+ document.getElementById('mCells').textContent=(s.h*s.h).toLocaleString('tr-TR');
+ document.getElementById('mRF').textContent=`${s.rf}×${s.rf}`;
+ document.getElementById('stageExplain').innerHTML=`<strong>${s.name}:</strong> ${s.text}`;
+}
+document.querySelectorAll('.stagebtn').forEach(b=>b.onclick=()=>renderStage(+b.dataset.i));renderStage(0);
+const old=document.getElementById('oldChannels'),kd=document.getElementById('kernelDepth');
+for(let i=1;i<=16;i++){const c=document.createElement('div');c.className='ch';c.textContent=i;old.appendChild(c);const k=document.createElement('div');k.className='kernel-slice';k.title=`channel ${i} için 3×3 kernel slice`;kd.appendChild(k)}
+const fs=document.getElementById('filterSlider');fs.oninput=()=>{document.getElementById('filterValue').textContent=`${fs.value} / 32`;document.getElementById('outFilterNo').textContent=fs.value};
+
+
+// Sliding kernel teaching lab
+const slideHost = document.getElementById('slideInput');
+if(slideHost){
+  const raw = [
+    [1,1,0,0,0],
+    [1,1,0,0,0],
+    [0,0,1,1,0],
+    [0,0,1,1,0],
+    [0,0,0,0,0]
+  ];
+  const padded = Array.from({length:7},()=>Array(7).fill(0));
+  for(let r=0;r<5;r++) for(let c=0;c<5;c++) padded[r+1][c+1]=raw[r][c];
+
+  const kernel = [
+    [1,0,-1],
+    [1,0,-1],
+    [1,0,-1]
+  ];
+  let sr=0, sc2=0;
+
+  function renderSlide(){
+    slideHost.innerHTML='';
+    const wrap=document.createElement('div');
+    wrap.className='matrix-grid';
+    wrap.style.gridTemplateColumns='repeat(7,42px)';
+    for(let r=0;r<7;r++){
+      for(let c=0;c<7;c++){
+        const d=document.createElement('div');
+        d.className='cell'+((r===0||c===0||r===6||c===6)?' pad':'');
+        if(r>=sr && r<sr+3 && c>=sc2 && c<sc2+3) d.classList.add('hl');
+        d.textContent=padded[r][c];
+        wrap.appendChild(d);
+      }
+    }
+    slideHost.appendChild(wrap);
+
+    const terms=[];
+    let sum=0;
+    for(let kr=0;kr<3;kr++){
+      for(let kc=0;kc<3;kc++){
+        const a=padded[sr+kr][sc2+kc];
+        const b=kernel[kr][kc];
+        terms.push(`${a}×${b}`);
+        sum+=a*b;
+      }
+    }
+    document.getElementById('slidePos').textContent=`${sr},${sc2}`;
+    document.getElementById('slideCalc').textContent =
+      terms.join(' + ') + `\n= ${sum}\n\n→ output[${sr},${sc2}] = ${sum}`;
+  }
+
+  function move(delta){
+    let idx=sr*5+sc2+delta;
+    idx=Math.max(0,Math.min(24,idx));
+    sr=Math.floor(idx/5); sc2=idx%5;
+    renderSlide();
+  }
+  document.getElementById('slidePrev').onclick=()=>move(-1);
+  document.getElementById('slideNext').onclick=()=>move(1);
+  renderSlide();
+}
+
+
+// richer kernel animation
+let slideTimer = null;
+const outBuild = document.getElementById('outputBuild');
+if(outBuild){
+  for(let i=0;i<25;i++){
+    const c=document.createElement('div');
+    c.className='o';
+    c.dataset.i=i;
+    outBuild.appendChild(c);
+  }
+
+  const originalRenderSlide = renderSlide;
+  renderSlide = function(){
+    originalRenderSlide();
+    const idx=sr*5+sc2;
+    document.querySelectorAll('#outputBuild .o').forEach((el,i)=>{
+      if(i<idx){ el.classList.add('filled'); if(!el.textContent) el.textContent='•'; }
+      else if(i===idx){
+        el.classList.add('filled');
+        const calc=document.getElementById('slideCalc').textContent;
+        const m=calc.match(/output\[[^\]]+\] = (-?\d+(?:\.\d+)?)/);
+        el.textContent=m?m[1]:'•';
+      } else { el.classList.remove('filled'); el.textContent=''; }
+    });
+  };
+
+  const autoBtn=document.getElementById('slideAuto');
+  autoBtn.onclick=()=>{
+    if(slideTimer){
+      clearInterval(slideTimer); slideTimer=null; autoBtn.textContent='▶ Otomatik tara'; return;
+    }
+    autoBtn.textContent='⏸ Durdur';
+    slideTimer=setInterval(()=>{
+      let idx=sr*5+sc2;
+      if(idx>=24){ sr=0; sc2=0; renderSlide(); return; }
+      move(1);
+    },650);
+  };
+}
+
+
+// Training animation
+const trainRows = [
+  ['cat',12],['dog',48],['car',6],['tree',7],['house',5],
+  ['fish',4],['airplane',3],['chair',5],['apple',6],['star',4]
+];
+const tp=document.getElementById('trainProbs');
+if(tp){
+  function renderTrainProbs(){
+    tp.innerHTML='';
+    trainRows.forEach(([name,p])=>{
+      const r=document.createElement('div');
+      r.className='ps-row';
+      r.innerHTML=`<span>${name}</span><div class="ps-track"><div class="ps-fill" style="width:${p}%"></div></div><b>${p}%</b>`;
+      tp.appendChild(r);
+    });
+  }
+  renderTrainProbs();
+
+  let stepCount=0;
+  const stages=['input','conv','logits','loss','back','grad','update'];
+  const status=document.getElementById('trainStatus');
+  const btn=document.getElementById('trainStep');
+  btn.onclick=()=>{
+    stepCount++;
+    document.getElementById('stepNo').textContent=stepCount;
+    document.querySelectorAll('.train-node').forEach(n=>n.classList.remove('active'));
+    let i=0;
+    const tick=setInterval(()=>{
+      document.querySelectorAll('.train-node').forEach(n=>n.classList.remove('active'));
+      const el=document.querySelector(`.train-node[data-stage="${stages[i]}"]`);
+      if(el)el.classList.add('active');
+      status.textContent =
+        stages[i]==='input'?'Drawing batch modele giriyor':
+        stages[i]==='conv'?'CNN forward pass':
+        stages[i]==='logits'?'10 logit üretildi':
+        stages[i]==='loss'?'CrossEntropyLoss hesaplandı':
+        stages[i]==='back'?'Gradient hesabı başlıyor':
+        stages[i]==='grad'?'Her weight için ∂loss/∂w bulundu':
+        'Adam weight’leri güncelliyor';
+      i++;
+      if(i>=stages.length){
+        clearInterval(tick);
+        setTimeout(()=>{
+          document.querySelectorAll('.train-node').forEach(n=>n.classList.remove('active'));
+          const cat=trainRows.find(x=>x[0]==='cat');
+          const dog=trainRows.find(x=>x[0]==='dog');
+          cat[1]=Math.min(88,cat[1]+8);
+          dog[1]=Math.max(8,dog[1]-6);
+          trainRows.forEach(x=>{if(x[0]!=='cat'&&x[0]!=='dog')x[1]=Math.max(1,x[1]-0.2)});
+          const total=trainRows.reduce((s,x)=>s+x[1],0);
+          trainRows.forEach(x=>x[1]=Math.round(x[1]/total*100));
+          renderTrainProbs();
+          document.getElementById('catProb').textContent=trainRows.find(x=>x[0]==='cat')[1]+'%';
+          const top=[...trainRows].sort((a,b)=>b[1]-a[1])[0][0];
+          document.getElementById('topPred').textContent=top;
+          const loss=Math.max(.22,1.82-stepCount*.19);
+          document.getElementById('lossValue').textContent=loss.toFixed(2);
+          document.getElementById('lossFill').style.width=Math.max(12,74-stepCount*8)+'%';
+
+          document.querySelectorAll('#weightDemo .weight-cell').forEach((el,j)=>{
+            const base=parseFloat(el.dataset.base);
+            const delta=((j%3)-1)*0.006*stepCount + (j%2?-.003:.004)*stepCount;
+            el.textContent=`w${j+1} = ${(base+delta).toFixed(3)}`;
+            el.classList.add('changed');
+            setTimeout(()=>el.classList.remove('changed'),700);
+          });
+          status.textContent='Weight’ler güncellendi. Sonraki batch için model biraz farklı.';
+        },250);
+      }
+    },420);
+  };
+}
+
+// Split explainer
+const splitText={
+ train:'<b>Train:</b> Weight’lerin gerçekten güncellendiği veri. Forward → loss → backward → Adam burada çalışır.',
+ validation:'<b>Validation:</b> Weight güncellenmez. Her epoch sonunda modelin görmediği bu bölümde val loss / val accuracy ölçülir ve en iyi checkpoint seçilir.',
+ test:'<b>Test:</b> Model ve checkpoint seçimi bittikten sonra final, tarafsız değerlendirme için kullanılır. Eğitim kararlarında kullanılmaz.'
+};
+document.querySelectorAll('.splitbtn').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('.splitbtn').forEach(x=>x.classList.remove('active'));
+ b.classList.add('active');
+ document.getElementById('splitExplain').innerHTML=splitText[b.dataset.split];
+});
+
+// softmax
+let logits=[2.5,1.1,.5,-.3,.2,-.7,0,.4,.8,-.1];
+const logitsEl=document.getElementById('logits'), probsEl=document.getElementById('probs');
+function renderLogits(){
+ logitsEl.innerHTML=''; classes.forEach((c,i)=>{
+  const row=document.createElement('div');row.className='logit';
+  row.innerHTML=`<span>${c}</span><input type="range" min="-4" max="4" value="${logits[i]}" step=".1" data-i="${i}"><b id="lv${i}">${logits[i].toFixed(1)}</b>`;
+  logitsEl.appendChild(row);
+ });
+ logitsEl.querySelectorAll('input').forEach(inp=>inp.oninput=e=>{let i=+e.target.dataset.i;logits[i]=+e.target.value;document.getElementById('lv'+i).textContent=logits[i].toFixed(1);renderProbs()});
+ renderProbs();
+}
+function renderProbs(){
+ let m=Math.max(...logits), ex=logits.map(x=>Math.exp(x-m)), z=ex.reduce((a,b)=>a+b,0), ps=ex.map(x=>x/z);
+ probsEl.innerHTML='';ps.forEach((p,i)=>{let r=document.createElement('div');r.className='probrow';r.innerHTML=`<span>${classes[i]}</span><div class="bar"><div class="fill" style="width:${(p*100).toFixed(1)}%"></div></div><b>${(p*100).toFixed(1)}%</b>`;probsEl.appendChild(r)})
+}
+renderLogits();
+
+
+const terms={
+ conv:['Convolution / Conv2D','Küçük bir kernel (burada 3×3), görüntünün üzerinde kaydırılır ve her bölgede ağırlıklı toplam hesaplar. Eğitim sırasında kernel ağırlıkları öğrenilir. Kenar, köşe, eğri gibi yerel desenlere duyarlı feature map’ler üretir.'],
+ relu:['ReLU','Rectified Linear Unit: max(0,x). Negatif aktivasyonları 0 yapar ve modele doğrusal olmayan ilişkileri öğrenme gücü kazandırır.'],
+ pool:['Max Pooling','Küçük bir bölgedeki en yüksek aktivasyonu tutar. Uzamsal çözünürlüğü düşürür, hesaplamayı azaltır ve küçük konum değişikliklerine karşı bir miktar dayanıklılık sağlar.'],
+ flatten:['Flatten','[kanal, yükseklik, genişlik] yapısını tek boyutlu vektöre açar. Burada 64×8×8 = 4096 sayı.'],
+ dropout:['Dropout','Sadece eğitim sırasında bazı aktivasyonları rastgele sıfırlar. Amaç tek tek nöronlara aşırı bağımlılığı ve overfitting’i azaltmaktır. eval() çağrısında dropout devre dışı kalır.'],
+ linear:['Linear / Fully Connected','y = Wx + b. 4096 özellikten her sınıf için bir skor üretir; burada çıkış boyutu 10.'],
+ stratified:['Stratified split','Train/validation/test oranlarını tüm veri üzerinde körlemesine değil, her sınıfın içinde ayrı ayrı uygular. Böylece sınıf dağılımları setler arasında daha dengeli kalır.'],
+ deterministic:['Deterministic','Aynı girdi ve aynı koşullarda tekrar çalıştırıldığında aynı sonucu üreten süreç. Sabit random seed, split’in yeniden üretilebilir olmasını sağlar.'],
+ tensor:['Tensor','PyTorch’un çok boyutlu sayısal veri yapısı. Görüntü batch’lerinde tipik düzen [batch, channel, height, width] olur.'],
+ checkpoint:['Checkpoint','Eğitilmiş modelin ağırlıkları ve çoğu zaman onu doğru yorumlamak için gerekli metadata’nın diskteki kaydı.'],
+ state:['state_dict','PyTorch modelinin öğrenilebilir parametrelerini isim→tensor biçiminde taşıyan sözlük. Mimariyi değil, öğrenilmiş ağırlıkları temsil eder.'],
+ logits:['Logit','Son katmanın ham sınıf skoru. Olasılık değildir; softmax öncesidir.'],
+ softmax:['Softmax','Birden çok logiti normalize ederek toplamı 1 olan sınıf olasılıklarına dönüştürür.'],
+ inference:['Inference','Eğitilmiş modelin yeni bir girdiye tahmin üretmesi. Training’den farklı olarak gradient ve ağırlık güncellemesi yapılmaz.'],
+ padding:['Padding','Kernel kenarlara geldiğinde boyutun küçülmesini önlemek için input etrafına eklenen yapay hücrelerdir; bu modelde zero padding=1 kullanılır.'],
+ stride:['Stride','Kernel’in input üzerinde her adımda kaç hücre kaydığını belirtir. Stride=1 ise birer piksel ilerler.'],
+ bias:['Bias','Ağırlıklı toplama eklenen öğrenilebilir offset. Her output channel’ın kendi bias değeri vardır.'],
+ channel:['Channel / Feature map','Aynı spatial grid üzerinde taşınan ayrı özellik haritası. Inputta 1 kanal, Conv1 sonrasında 16 feature map vardır.'],
+ filter:['Filter','Bir output feature map üretmek için kullanılan öğrenilebilir weight kümesi. Çok kanallı inputta filter derinliği input channel sayısına eşittir.']
+};
+const gl=document.getElementById('glossary');
+Object.entries(terms).forEach(([k,[t,b]])=>{let e=document.createElement('div');e.className='g';e.innerHTML=`<b>${t}</b><span>${b}</span>`;gl.appendChild(e)});
+const modal=document.getElementById('modal');function openTerm(k){let [t,b]=terms[k];document.getElementById('modalTitle').textContent=t;document.getElementById('modalBody').textContent=b;modal.classList.add('show')}
+document.querySelectorAll('.term').forEach(t=>t.onclick=()=>openTerm(t.dataset.term));
+document.getElementById('modalX').onclick=()=>modal.classList.remove('show');modal.onclick=e=>{if(e.target===modal)modal.classList.remove('show')}
+</script>
+</body>
+</html>
