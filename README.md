@@ -8,7 +8,7 @@ If you are new to the project, begin with the interactive explainer. It explains
 
 **[Open the SketchNet interactive system explainer](https://swrtan.github.io/sketchnet/)**
 
-After the explanation, try the actual local application by following the setup and run instructions below. The explainer and the app are separate on purpose: one teaches the pipeline, the other runs real local inference.
+After the explanation, try the actual local application by following the setup and run instructions below. The explainer and the app are separate on purpose: one teaches the pipeline, the other runs real local inference. GitHub Pages can host the static explainer, but it cannot run the FastAPI inference endpoint; the app therefore runs locally at `127.0.0.1:8877`.
 
 ## Setup
 
