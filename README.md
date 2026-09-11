@@ -2,6 +2,14 @@
 
 SketchNet Lab is a local Quick, Draw! experiment: draw on a canvas, watch the same 64×64 rasterized input sent to a small PyTorch CNN, and inspect measured probabilities and final convolution channels. Runtime inference uses no LLM or network service.
 
+## Start with the visual explanation
+
+If you are new to the project, begin with the interactive explainer. It explains the complete path from a hand-drawn stroke to the shared rasterizer, the 64×64 tensor, the local CNN, measured probabilities, convolution activations, and the browser inspector.
+
+**[Open the SketchNet interactive system explainer](https://swrtan.github.io/sketchnet/)**
+
+After the explanation, try the actual local application by following the setup and run instructions below. The explainer and the app are separate on purpose: one teaches the pipeline, the other runs real local inference.
+
 ## Setup
 
 ```powershell
